@@ -1,33 +1,29 @@
 const express = require('express');
 const database = require("./config/database");
+const bodyParser = require("body-parser")
+const cookieParser = require("cookie-parser");
+const cors = require("cors")
 require("dotenv").config();
+
+const routesApiVer1 = require("./api/v1/routes/index.route")
+
 const app = express();
 const port = process.env.PORT;
 
+app.use(cors());
+
 
 database.connect();
-const Task = require("./models/task.model")
 
-app.get("/tasks", async (req,res) => {
-  const tasks = await Task.find({
-    deleted: false
-  })
-  console.log(tasks)
-  res.json(tasks);
-});
+app.use(cookieParser());
 
-app.get("/tasks/detail/:id", async (req,res) => {
-  try {
-    const id =req.params.id;
-    const task = await Task.findOne({
-      _id: id,
-      deleted: false
-    })
-    res.json(task);
-  } catch (error) {
-    res.json("Không tìm thấy!");
-  }
-});
+// parse application/json
+app.use(bodyParser.json())
+
+// Routes Version 1
+routesApiVer1(app)
+
+
 
 
 
